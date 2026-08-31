@@ -63,6 +63,47 @@ Actor:
 
 ## UC-009 — Catat Zakat Fitrah
 
-Actor:
+### Actor
 
-- Petugas Lokasi
+Petugas Lokasi
+
+### Goal
+
+Mencatat pembayaran zakat fitrah yang dilakukan oleh
+warga/keluarga.
+
+### Preconditions
+
+- Petugas telah login.
+- Akun petugas aktif.
+- Petugas telah memiliki lokasi.
+- Periode pendataan sedang aktif.
+
+### Main Flow
+
+1. Petugas membuka menu pendataan zakat.
+2. Petugas memilih Tambah Data.
+3. Sistem menampilkan formulir.
+4. Petugas memasukkan nama kepala keluarga.
+5. Petugas memasukkan jumlah jiwa.
+6. Petugas memasukkan jumlah beras dan/atau uang.
+7. Petugas mengonfirmasi tanggal pembayaran.
+8. Petugas memilih Simpan.
+9. Sistem melakukan validasi.
+10. Sistem menyimpan data.
+11. Sistem menampilkan informasi bahwa data berhasil disimpan.
+
+### Alternative Flow
+
+#### Jumlah jiwa tidak valid
+
+Jika jumlah jiwa kurang dari satu, sistem menolak data
+dan menampilkan pesan kesalahan.
+
+#### Pembayaran kosong
+
+Jika beras dan uang tidak diisi, sistem menolak data.
+
+### Postconditions
+
+Data pembayaran zakat tersimpan pada lokasi milik petugas.
