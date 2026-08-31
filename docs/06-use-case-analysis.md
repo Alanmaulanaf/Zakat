@@ -565,83 +565,141 @@ Ketentuan zakat tersimpan untuk periode yang dipilih.
 
 ---
 
-# UC-009 — Catat Zakat Fitrah
+## UC-009 — Catat Zakat Fitrah
 
-## Primary Actor
+### Primary Actor
 
 Petugas Lokasi
 
-## Goal
+### Goal
 
-Mencatat pembayaran zakat fitrah warga atau keluarga.
+Mencatat pembayaran zakat fitrah warga atau keluarga serta menghubungkan pembayaran tersebut dengan pencatatan keluarga yang sesuai.
 
-## Preconditions
+### Preconditions
 
 * Petugas telah login.
 * Akun petugas aktif.
 * Petugas memiliki lokasi penugasan.
-* Periode pendataan aktif.
+* Periode pendataan zakat sedang aktif.
 
-## Trigger
+### Trigger
 
-Warga datang menunaikan zakat dan Petugas memilih Tambah Data.
+Warga datang menunaikan zakat dan Petugas memilih Tambah Pembayaran Zakat.
 
-## Main Flow
+### Main Flow
 
-1. Petugas membuka menu pendataan.
-2. Petugas memilih Tambah Data.
-3. Sistem menampilkan formulir.
-4. Sistem menentukan lokasi berdasarkan penugasan petugas.
-5. Sistem menentukan periode aktif.
+1. Petugas membuka menu pendataan zakat.
+2. Petugas memilih Tambah Pembayaran.
+3. Sistem menampilkan formulir pembayaran.
+4. Sistem menentukan lokasi berdasarkan penugasan Petugas.
+5. Sistem menentukan periode zakat yang sedang aktif.
 6. Petugas memasukkan nama kepala keluarga.
-7. Petugas memasukkan jumlah jiwa.
-8. Petugas memasukkan jumlah beras dan/atau nominal uang.
-9. Petugas mengonfirmasi tanggal pembayaran.
-10. Petugas memilih Simpan.
-11. Sistem melakukan validasi.
-12. Sistem menyimpan data zakat.
-13. Sistem memperbarui perhitungan rekap lokasi.
-14. Sistem mencatat aktivitas penting.
-15. Sistem menampilkan informasi bahwa data berhasil disimpan.
+7. Petugas memasukkan informasi identifikasi keluarga yang diperlukan.
+8. Petugas memasukkan jumlah jiwa yang dibayarkan.
+9. Petugas memasukkan jumlah jiwa yang membayar menggunakan beras jika ada.
+10. Petugas memasukkan jumlah beras jika ada.
+11. Petugas memasukkan jumlah jiwa yang membayar menggunakan uang jika ada.
+12. Petugas memasukkan nominal uang jika ada.
+13. Petugas mengonfirmasi tanggal pembayaran.
+14. Petugas memilih Simpan.
+15. Sistem melakukan validasi data pembayaran.
+16. Sistem melakukan pemeriksaan otomatis terhadap pencatatan keluarga yang telah tersedia pada periode dan konteks lokasi yang sama.
+17. Jika tidak ditemukan keluarga yang sesuai, sistem membuat pencatatan keluarga baru.
+18. Sistem menyimpan pembayaran sebagai riwayat pembayaran keluarga tersebut.
+19. Sistem memperbarui perhitungan rekap lokasi.
+20. Sistem mencatat aktivitas penting pada audit log.
+21. Sistem menampilkan informasi bahwa pembayaran berhasil disimpan.
 
-## Alternative Flow
+### Alternative Flow
 
-### AF-01 — Jumlah Jiwa Tidak Valid
+#### AF-01 — Jumlah Jiwa Tidak Valid
 
-1. Petugas memasukkan jumlah jiwa kurang dari satu.
+1. Jumlah jiwa kurang dari satu atau tidak diisi.
 2. Sistem menolak penyimpanan.
 3. Sistem menampilkan pesan validasi.
+4. Petugas memperbaiki data.
 
-### AF-02 — Tidak Ada Pembayaran
+#### AF-02 — Bentuk Pembayaran Tidak Diisi
 
-1. Jumlah beras dan nominal uang tidak diisi.
+1. Pembayaran beras dan uang tidak memiliki nilai.
 2. Sistem menolak penyimpanan.
-3. Sistem meminta minimal satu bentuk pembayaran.
+3. Sistem meminta Petugas mengisi minimal satu bentuk pembayaran.
 
-### AF-03 — Nilai Beras Tidak Valid
+#### AF-03 — Jumlah Jiwa Pembayaran Tidak Konsisten
+
+1. Total jiwa berdasarkan pembayaran beras dan uang tidak sama dengan jumlah jiwa pembayaran.
+2. Sistem menolak penyimpanan.
+3. Sistem menampilkan informasi ketidaksesuaian.
+4. Petugas memperbaiki data.
+
+Contoh:
+
+Jumlah jiwa pembayaran: 5
+
+Jiwa beras: 3
+Jiwa uang: 2
+
+Data valid karena 3 + 2 = 5.
+
+#### AF-04 — Sistem Menemukan Kemungkinan Keluarga yang Sama
+
+1. Setelah Petugas memilih Simpan, sistem menemukan satu atau lebih pencatatan keluarga yang berpotensi sama.
+2. Sistem menampilkan kandidat keluarga yang ditemukan.
+3. Sistem menampilkan informasi yang diperlukan untuk membantu Petugas membedakan keluarga.
+4. Petugas memeriksa kandidat.
+
+Jika salah satu kandidat merupakan keluarga yang sama:
+
+5. Petugas memilih keluarga tersebut.
+6. Petugas mengonfirmasi.
+7. Sistem menambahkan pembayaran baru pada pencatatan keluarga tersebut.
+8. Pembayaran sebelumnya tetap dipertahankan.
+
+Jika kandidat bukan keluarga yang sama:
+
+5. Petugas memilih Buat Pencatatan Keluarga Baru.
+6. Sistem membuat pencatatan keluarga baru.
+7. Sistem menyimpan pembayaran pada pencatatan baru.
+
+#### AF-05 — Pembayaran Tambahan
+
+1. Sistem menemukan pencatatan keluarga yang sebelumnya telah melakukan pembayaran.
+2. Petugas mengonfirmasi bahwa keluarga tersebut sama.
+3. Sistem tidak mengubah pembayaran sebelumnya.
+4. Sistem membuat riwayat pembayaran baru pada keluarga tersebut.
+5. Sistem menghitung ulang total keluarga dan rekap lokasi.
+
+#### AF-06 — Nilai Beras Tidak Valid
 
 1. Petugas memasukkan jumlah beras negatif.
 2. Sistem menolak penyimpanan.
+3. Sistem meminta Petugas memperbaiki jumlah beras.
 
-### AF-04 — Nominal Uang Tidak Valid
+#### AF-07 — Nominal Uang Tidak Valid
 
 1. Petugas memasukkan nominal uang negatif.
 2. Sistem menolak penyimpanan.
+3. Sistem meminta Petugas memperbaiki nominal uang.
 
-### AF-05 — Periode Tidak Aktif
+#### AF-08 — Periode Tidak Aktif
 
-1. Petugas mencoba melakukan pendataan di luar periode aktif.
+1. Petugas mencoba melakukan pendataan ketika periode pendataan tidak aktif.
 2. Sistem menolak pencatatan.
-3. Sistem menampilkan informasi bahwa periode pendataan tidak aktif.
+3. Sistem menampilkan informasi bahwa periode zakat tidak sedang aktif.
 
-## Postconditions
+### Postconditions
 
-* Data zakat tersimpan.
-* Data terhubung dengan lokasi petugas.
-* Data terhubung dengan periode aktif.
-* Rekap lokasi diperbarui.
+Jika proses berhasil:
 
-## Related Requirements
+* pencatatan keluarga tersedia;
+* pembayaran tersimpan sebagai riwayat pembayaran;
+* pembayaran tidak menimpa pembayaran sebelumnya;
+* pembayaran terkait dengan lokasi Petugas;
+* pembayaran terkait dengan periode zakat;
+* rekap lokasi diperbarui;
+* aktivitas penting dapat dilacak.
+
+### Related Requirements
 
 * FR-009
 * FR-010
@@ -653,7 +711,7 @@ Warga datang menunaikan zakat dan Petugas memilih Tambah Data.
 * FR-017
 * FR-018
 
-## Related Business Rules
+### Related Business Rules
 
 * BR-001
 * BR-002
@@ -663,6 +721,14 @@ Warga datang menunaikan zakat dan Petugas memilih Tambah Data.
 * BR-006
 * BR-007
 * BR-008
+* BR-062
+* BR-063
+* BR-064
+* BR-065
+* BR-066
+* BR-067
+* BR-068
+* BR-069
 
 ---
 
